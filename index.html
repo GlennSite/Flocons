@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jeu d'Évitement de Flocons</title>
+  <title>Carte de Voeux</title>
   <style>
     /* Style global */
     body, html {
@@ -169,6 +169,28 @@
         font-size: 20px;
       }
     }
+
+/* Responsivité de la vidéo YouTube (format vertical) */
+#video-container {
+  margin: 20px 0;
+  width: 100%;
+  max-width: 360px; /* Largeur plus étroite pour un format vertical */
+  height: 640px; /* Hauteur pour correspondre à un format vertical */
+  margin-bottom: 30px;
+  display: flex;               /* Ajouter flexbox */
+  justify-content: center;     /* Centrer horizontalement */
+  align-items: center;         /* Centrer verticalement */
+  position: relative;          /* Permet de contrôler la position de l'iframe */
+}
+
+#youtubeVideo {
+  width: 100%;                 /* Utilise toute la largeur disponible dans le conteneur */
+  height: 100%;                /* Utilise toute la hauteur disponible dans le conteneur */
+  border: none;                /* Retirer la bordure par défaut */
+}
+
+
+
   </style>
 </head>
 <body>
@@ -194,12 +216,25 @@
   <button id="startButton">Commencer le jeu</button>
 </div>
 
+<!-- Ecran de fin de jeu -->
 <div class="game-over-screen fade-in">
   <h2>Game Over</h2>
   <p>Score : <span id="finalScore"></span></p>
+<!-- Conteneur pour la vidéo -->
+<div id="video-container">
+  <iframe id="youtubeVideo" 
+    src="https://www.youtube.com/embed/Yt9VhQ625CQ?autoplay=1&mute=1&loop=1&playlist=Yt9VhQ625CQ" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
+
   <button id="restartButton">Recommencer</button>
   <button id="backToSelectionButton">Retour à la sélection</button>
 </div>
+
+
 
 <script>
   const canvas = document.getElementById("gameCanvas");
@@ -387,7 +422,13 @@
 function showGameOverScreen() {
   finalScoreElement.textContent = score;
   gameOverScreen.style.display = "block"; // Affiche l'écran de fin de jeu
+
+  // Relancer la vidéo YouTube
+  const youtubeVideo = document.getElementById('youtubeVideo');
+  youtubeVideo.src = "https://www.youtube.com/embed/Yt9VhQ625CQ?autoplay=1&mute=0&loop=1&playlist=Yt9VhQ625CQ"; // Recharger la vidéo
 }
+
+
 
   restartButton.addEventListener("click", startGame);
   backToSelectionButton.addEventListener("click", () => {
