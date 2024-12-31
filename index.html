@@ -206,6 +206,13 @@
   </style>
 </head>
 <body>
+<!-- Ajouter le fichier audio de fond -->
+<audio id="backgroundMusic" loop>
+  <source src="audio/music.mp3" type="audio/mp3"> <!-- Remplacez par le chemin de votre musique -->
+  Votre navigateur ne supporte pas l'élément audio.
+</audio>
+
+
 
 <canvas id="gameCanvas"></canvas>
 
@@ -292,13 +299,16 @@
     "anais_super": new Audio("audio/anais_super.m4a"),
   };
 
-  // Fonction pour arrêter tous les sons
-  function stopAllSounds() {
-    Object.values(sounds).forEach(sound => {
+// Fonction pour arrêter tous les sons sauf la musique de fond
+function stopAllSounds() {
+  Object.values(sounds).forEach(sound => {
+    // On arrête le son uniquement si ce n'est pas la musique de fond
+    if (sound !== backgroundMusic) {
       sound.pause();
       sound.currentTime = 0;
-    });
-  }
+    }
+  });
+}
 
   // Fonction pour jouer ou reprendre un son
   function handleHoverSound(characterName) {
@@ -367,8 +377,15 @@
     player.x = canvas.width / 2;
     player.y = canvas.height - 50;
     gameOverScreen.style.display = "none";
+    stopVideo();
     update();
   }
+
+// Fonction pour couper la vidéo
+function stopVideo() {
+  const youtubeVideo = document.getElementById('youtubeVideo');
+  youtubeVideo.src = ""; // Réinitialiser la source de la vidéo pour arrêter la lecture
+}
 
   // Créer des flocons de neige
   function createSnowflake() {
@@ -446,6 +463,7 @@ function showGameOverScreen() {
   backToSelectionButton.addEventListener("click", () => {
     gameOverScreen.style.display = "none";
     selectionScreen.style.display = "block";
+    stopVideo();
   });
 
   setInterval(createSnowflake, 1000);
@@ -453,6 +471,56 @@ function showGameOverScreen() {
   window.addEventListener("mousemove", movePlayer);
 
   selectionScreen.style.display = "block";
+
+
+/// GEestion musique de fond
+  const backgroundMusic = document.getElementById("backgroundMusic");
+const youtubeVideo = document.getElementById("youtubeVideo");
+
+// Réduire le volume de la musique de fond
+backgroundMusic.volume = 0.2; // Volume réduit à 10%
+
+// Fonction pour couper la musique lorsque la vidéo est lancée
+function stopBackgroundMusic() {
+  backgroundMusic.pause();
+}
+
+// Fonction pour relancer la musique lorsque la vidéo est arrêtée
+function resumeBackgroundMusic() {
+  backgroundMusic.play();
+}
+
+// Quand la vidéo YouTube commence, on coupe la musique
+youtubeVideo.addEventListener("load", () => {
+  stopBackgroundMusic();
+});
+
+// Quand la vidéo YouTube se termine ou est arrêtée, on relance la musique
+youtubeVideo.addEventListener("pause", () => {
+  resumeBackgroundMusic();
+});
+
+// Lancer la musique lorsque la page est prête (avant la vidéo)
+window.addEventListener("load", () => {
+  backgroundMusic.play(); // Joue la musique en fond au chargement de la page
+});
+
+// Redémarrer la musique à chaque fois que le jeu recommence
+restartButton.addEventListener("click", () => {
+  stopBackgroundMusic();  // Couper la musique avant de redémarrer
+  startGame();
+  resumeBackgroundMusic(); // Relancer la musique après le redémarrage du jeu
+});
+
+// Retour à la sélection
+backToSelectionButton.addEventListener("click", () => {
+  stopBackgroundMusic();  // Couper la musique avant de revenir à la sélection
+  gameOverScreen.style.display = "none";
+  selectionScreen.style.display = "block";
+  resumeBackgroundMusic(); // Relancer la musique en revenant à la sélection
+});
+
+
 </script>
 </body>
 </html>
