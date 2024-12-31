@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeu d'Évitement de Flocons</title>
+  <style>
+    /* Style global */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      background: #F4F9FF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Animation de fade-in */
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Style du conteneur principal */
+    .selection-screen {
+      text-align: center;
+      max-width: 500px;
+      width: 80%;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 1s ease-out;
+      z-index: 10; /* Pour s'assurer que la sélection soit au-dessus du canvas */
+      position: absolute;
+    }
+
+    /* Titre de la page */
+    .selection-screen h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* Grille de sélection des personnages */
+    #characters {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
+    /* Style des boutons de personnage */
+    .character-choice {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+    }
+
+    .character-choice img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .character-choice:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      border: 4px solid #ff4081;
+    }
+
+    .character-choice.selected {
+      border: 4px solid #ff4081;
+    }
+
+    /* Bouton Start */
+    #startButton {
+      padding: 15px 30px;
+      background-color: #ff4081;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    #startButton:hover {
+      background-color: #f50057;
+    }
+
+    /* Boutons d'action en fin de jeu */
+    .game-over-screen {
+      text-align: center;
+      display: none;
+    }
+
+    .game-over-screen h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .game-over-screen button {
+      padding: 12px 24px;
+      background-color: #2196F3;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .game-over-screen button:hover {
+      background-color: #1976D2;
+    }
+
+    /* Responsivité */
+    @media (max-width: 600px) {
+      .character-choice {
+        width: 90px;
+        height: 90px;
+      }
+
+      #startButton {
+        padding: 12px 24px;
+        font-size: 16px;
+      }
+
+      .selection-screen h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div class="selection-screen fade-in">
+  <h2>Choisissez votre personnage</h2>
+  <div id="characters">
+    <div class="character-choice" id="char1">
+      <img src="img/glenn.png" alt="Glenn">
+    </div>
+    <div class="character-choice" id="char2">
+      <img src="img/juliette.png" alt="Juliette">
+    </div>
+    <div class="character-choice" id="char3">
+      <img src="img/robin.png" alt="Robin">
+    </div>
+    <div class="character-choice" id="char4">
+      <img src="img/anais.png" alt="Anaïs">
+    </div>
+  </div>
+  <button id="startButton">Commencer le jeu</button>
+</div>
+
+<div class="game-over-screen fade-in">
+  <h2>Game Over</h2>
+  <p>Score : <span id="finalScore"></span></p>
+  <button id="restartButton">Recommencer</button>
+  <button id="backToSelectionButton">Retour à la sélection</button>
+</div>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const startButton = document.getElementById("startButton");
+  const restartButton = document.getElementById("restartButton");
+  const backToSelectionButton = document.getElementById("backToSelectionButton");
+  const characters = document.getElementById("characters").children;
+  const selectionScreen = document.querySelector(".selection-screen");
+  const gameOverScreen = document.querySelector(".game-over-screen");
+  const finalScoreElement = document.getElementById("finalScore");
+
+  // Images des personnages
+  const playerImages = {
+    "glenn": new Image(),
+    "juliette": new Image(),
+    "robin": new Image(),
+    "anais": new Image(),
+  };
+  playerImages["glenn"].src = "img/glenn.png";
+  playerImages["juliette"].src = "img/juliette.png";
+  playerImages["robin"].src = "img/robin.png";
+  playerImages["anais"].src = "img/anais.png";
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let player = { x: canvas.width / 2, y: canvas.height - 50, width: 50, height: 50, image: null };
+  let snowflakes = [];
+  let score = 0;
+  let gameOver = false;
+  let selectedCharacter = null;
+
+  // Sons des personnages et son de sélection
+  const sounds = {
+    "glenn": new Audio("audio/glenn.m4a"),
+    "juliette": new Audio("audio/juliette.m4a"),
+    "robin": new Audio("audio/robin.m4a"),
+    "anais": new Audio("audio/anais.m4a"),
+    "glenn_super": new Audio("audio/glenn_super.m4a"),
+    "juliette_super": new Audio("audio/juliette_super.m4a"),
+    "robin_super": new Audio("audio/robin_super.m4a"),
+    "anais_super": new Audio("audio/anais_super.m4a"),
+  };
+
+  // Fonction pour arrêter tous les sons
+  function stopAllSounds() {
+    Object.values(sounds).forEach(sound => {
+      sound.pause();
+      sound.currentTime = 0;
+    });
+  }
+
+  // Fonction pour jouer ou reprendre un son
+  function handleHoverSound(characterName) {
+    const sound = sounds[characterName];
+    if (sound.ended) {
+      sound.currentTime = 0;
+    }
+    sound.play();
+  }
+
+  // Gérer le survol et la sélection du personnage
+  Array.from(characters).forEach((character, index) => {
+    const characterId = `char${index + 1}`;
+    const characterName = characterId === "char1" ? "glenn"
+                     : characterId === "char2" ? "juliette"
+                     : characterId === "char3" ? "robin"
+                     : "anais"; // char4
+
+    // Survol du bouton d'un personnage
+    character.addEventListener("mouseover", () => {
+      handleHoverSound(characterName);
+      if (!character.classList.contains("selected")) {
+        character.style.border = "4px solid #ff4081";
+      }
+    });
+
+    // Fin du survol
+    character.addEventListener("mouseout", () => {
+      if (!character.classList.contains("selected")) {
+        character.style.border = "none";
+      }
+      sounds[characterName].pause();
+    });
+
+    // Clic sur un personnage
+    character.addEventListener("click", () => {
+      stopAllSounds();
+      selectedCharacter = characterName;
+      player.image = playerImages[characterName];
+      sounds[`${selectedCharacter}_super`].play();
+
+      Array.from(characters).forEach(c => {
+        c.classList.remove("selected");
+        c.style.border = "none";
+      });
+
+      character.classList.add("selected");
+      character.style.border = "4px solid #ff4081";
+    });
+  });
+
+  // Commencer le jeu
+  startButton.addEventListener("click", () => {
+    if (!selectedCharacter) {
+      alert("Veuillez sélectionner un personnage !");
+      return;
+    }
+    selectionScreen.style.display = "none";
+    stopAllSounds();
+    startGame();
+  });
+
+  function startGame() {
+    gameOver = false;
+    score = 0;
+    snowflakes = [];
+    player.x = canvas.width / 2;
+    player.y = canvas.height - 50;
+    gameOverScreen.style.display = "none";
+    update();
+  }
+
+  // Créer des flocons de neige
+  function createSnowflake() {
+    const x = Math.random() * canvas.width;
+    const size = Math.random() * 20 + 10;
+    const speed = Math.random() * 3 + 1;
+    snowflakes.push({ x, y: -size, size, speed });
+  }
+
+  // Déplacer le joueur
+  function movePlayer(event) {
+    const touchX = event.touches ? event.touches[0].clientX : event.clientX;
+    player.x = touchX - player.width / 2;
+    if (player.x < 0) player.x = 0;
+    if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+  }
+
+  // Mettre à jour le jeu
+  function update() {
+    if (gameOver) return;
+
+    snowflakes.forEach(snowflake => {
+      snowflake.y += snowflake.speed;
+      if (snowflake.y > canvas.height) snowflake.y = -snowflake.size;
+    });
+
+    snowflakes.forEach(snowflake => {
+      if (
+        player.x < snowflake.x + snowflake.size &&
+        player.x + player.width > snowflake.x &&
+        player.y < snowflake.y + snowflake.size &&
+        player.y + player.height > snowflake.y
+      ) {
+        gameOver = true;
+        showGameOverScreen();
+      }
+    });
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#A1C6EA";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    snowflakes.forEach(snowflake => {
+      ctx.beginPath();
+      ctx.arc(snowflake.x, snowflake.y, snowflake.size, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.fill();
+    });
+
+    if (player.image) {
+      ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+    }
+
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText("Score: " + score, 20, 40);
+
+    score++;
+    requestAnimationFrame(update);
+  }
+
+  function showGameOverScreen() {
+    finalScoreElement.textContent = score;
+    gameOverScreen.style.display = "block";
+  }
+
+  restartButton.addEventListener("click", startGame);
+  backToSelectionButton.addEventListener("click", () => {
+    gameOverScreen.style.display = "none";
+    selectionScreen.style.display = "block";
+  });
+
+  setInterval(createSnowflake, 1000);
+  window.addEventListener("touchmove", movePlayer);
+  window.addEventListener("mousemove", movePlayer);
+
+  selectionScreen.style.display = "block";
+</script>
+</body>
+</html>
