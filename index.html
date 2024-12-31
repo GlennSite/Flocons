@@ -105,53 +105,54 @@
     #startButton:hover {
       background-color: #f50057;
     }
-/* Style des écrans de fin de jeu */
-.game-over-screen {
-  text-align: center;
-  display: none; /* Caché par défaut */
-  position: fixed; /* Positionné de manière fixe au centre */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* Centré à la fois horizontalement et verticalement */
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  z-index: 10; /* Assurez-vous qu'il soit au-dessus de tout le reste */
-  width: 80%;
-  max-width: 500px;
-}
 
-/* Style du texte du Game Over */
-.game-over-screen h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #333;
-}
+    /* Style des écrans de fin de jeu */
+    .game-over-screen {
+      text-align: center;
+      display: none; /* Caché par défaut */
+      position: fixed; /* Positionné de manière fixe au centre */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Centré à la fois horizontalement et verticalement */
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      z-index: 10; /* Assurez-vous qu'il soit au-dessus de tout le reste */
+      width: 80%;
+      max-width: 500px;
+    }
 
-/* Style du score */
-.game-over-screen p {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
-}
+    /* Style du texte du Game Over */
+    .game-over-screen h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #333;
+    }
 
-/* Style des boutons de fin de jeu */
-.game-over-screen button {
-  padding: 12px 24px;
-  background-color: #2196F3;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+    /* Style du score */
+    .game-over-screen p {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
 
-.game-over-screen button:hover {
-  background-color: #1976D2;
-}
+    /* Style des boutons de fin de jeu */
+    .game-over-screen button {
+      padding: 12px 24px;
+      background-color: #2196F3;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .game-over-screen button:hover {
+      background-color: #1976D2;
+    }
 
     /* Responsivité */
     @media (max-width: 600px) {
@@ -170,39 +171,34 @@
       }
     }
 
-/* Style du conteneur pour la vidéo YouTube */
-#video-container {
-  width: 100%;  /* Utiliser toute la largeur disponible */
-  max-width: 360px;  /* Largeur maximale du conteneur */
-  height: 400px;  /* Hauteur fixe pour la vidéo */
-  display: flex;  /* Utiliser flexbox pour centrer le contenu */
-  justify-content: center;  /* Centrer horizontalement */
-  align-items: center;  /* Centrer verticalement */
-  margin: 20px auto;  /* Centrer le conteneur sur l'écran avec des marges automatiques */
-  position: relative;
-}
+    /* Style du conteneur pour la vidéo locale */
+    #video-container {
+      width: 100%;
+      max-width: 360px;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      position: relative;
+    }
 
-#youtubeVideo {
-  width: 100%;  /* Prendre toute la largeur du conteneur */
-  height: 100%;  /* Prendre toute la hauteur du conteneur */
-  border: none;  /* Retirer les bordures */
-}
+    #localVideo {
+      width: 100%;
+      height: 100%;
+      border: none;
+      object-fit: cover;
+    }
 
-
-
-/* Style du canvas pour le mini-jeu */
-#gameCanvas {
-  position: fixed; /* Positionné de manière fixe */
-  top: 0;
-  left: 0;
-  width: 100%; /* Prend toute la largeur */
-  height: 100%; /* Prend toute la hauteur */
-  z-index: -1; /* Placer le canvas derrière tout le reste */
-}
-
-
-
-
+    /* Style du canvas pour le mini-jeu */
+    #gameCanvas {
+      position: fixed; /* Positionné de manière fixe */
+      top: 0;
+      left: 0;
+      width: 100%; /* Prend toute la largeur */
+      height: 100%; /* Prend toute la hauteur */
+      z-index: -1; /* Placer le canvas derrière tout le reste */
+    }
   </style>
 </head>
 <body>
@@ -211,8 +207,6 @@
   <source src="audio/music.mp3" type="audio/mp3"> <!-- Remplacez par le chemin de votre musique -->
   Votre navigateur ne supporte pas l'élément audio.
 </audio>
-
-
 
 <canvas id="gameCanvas"></canvas>
 
@@ -235,24 +229,21 @@
   <button id="startButton">Commencer le jeu</button>
 </div>
 
-
 <!-- Ecran de fin de jeu -->
 <div class="game-over-screen fade-in">
   <p>Score : <span id="finalScore"></span></p>
-<!-- Conteneur pour la vidéo -->
-<div id="video-container">
-  <iframe id="youtubeVideo" 
-    src="https://www.youtube.com/embed/Yt9VhQ625CQ?autoplay=1&mute=1&loop=1&playlist=Yt9VhQ625CQ" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
-</div>
+  <!-- Conteneur pour la vidéo locale -->
+  <div id="video-container">
+<video id="localVideo" autoplay loop>
+  <source src="video.mov" type="video/mp4">
+  Votre navigateur ne supporte pas l'élément vidéo.
+</video>
+
+  </div>
 
   <button id="restartButton">Recommencer</button>
   <button id="backToSelectionButton">Retour à la sélection</button>
 </div>
-
 
 
 <script>
@@ -381,11 +372,12 @@ function stopAllSounds() {
     update();
   }
 
-// Fonction pour couper la vidéo
-function stopVideo() {
-  const youtubeVideo = document.getElementById('youtubeVideo');
-  youtubeVideo.src = ""; // Réinitialiser la source de la vidéo pour arrêter la lecture
-}
+  // Fonction pour arrêter la vidéo locale
+  function stopVideo() {
+    const localVideo = document.getElementById('localVideo');
+    localVideo.pause();
+    localVideo.currentTime = 0;
+  }
 
   // Créer des flocons de neige
   function createSnowflake() {
@@ -450,12 +442,29 @@ function stopVideo() {
 
 function showGameOverScreen() {
   finalScoreElement.textContent = score;
-  gameOverScreen.style.display = "block"; // Affiche l'écran de fin de jeu
-
-  // Relancer la vidéo YouTube
-  const youtubeVideo = document.getElementById('youtubeVideo');
-  youtubeVideo.src = "https://www.youtube.com/embed/Yt9VhQ625CQ?autoplay=1&mute=0&loop=1&playlist=Yt9VhQ625CQ"; // Recharger la vidéo
+  gameOverScreen.style.display = "block";
+  const localVideo = document.getElementById('localVideo');
+  
+  // Assurez-vous que la vidéo joue et que le son est activé
+  localVideo.volume = 1.0; // Volume maximum
+  localVideo.muted = false; // Désactive la sourdine
+  localVideo.play().catch(error => {
+    console.error("La vidéo ne peut pas démarrer automatiquement : ", error);
+  });
 }
+
+
+restartButton.addEventListener("click", () => {
+  const localVideo = document.getElementById('localVideo');
+  
+  // Assurez-vous que la vidéo démarre
+  localVideo.muted = false; // Désactiver le mode muet
+  localVideo.play().catch(error => {
+    console.error("La vidéo ne peut pas démarrer automatiquement : ", error);
+  });
+
+  startGame();
+});
 
 
 
