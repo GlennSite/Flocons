@@ -105,34 +105,53 @@
     #startButton:hover {
       background-color: #f50057;
     }
+/* Style des écrans de fin de jeu */
+.game-over-screen {
+  text-align: center;
+  display: none; /* Caché par défaut */
+  position: fixed; /* Positionné de manière fixe au centre */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centré à la fois horizontalement et verticalement */
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  z-index: 10; /* Assurez-vous qu'il soit au-dessus de tout le reste */
+  width: 80%;
+  max-width: 500px;
+}
 
-    /* Boutons d'action en fin de jeu */
-    .game-over-screen {
-      text-align: center;
-      display: none;
-    }
+/* Style du texte du Game Over */
+.game-over-screen h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #333;
+}
 
-    .game-over-screen h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-      color: #333;
-    }
+/* Style du score */
+.game-over-screen p {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
 
-    .game-over-screen button {
-      padding: 12px 24px;
-      background-color: #2196F3;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+/* Style des boutons de fin de jeu */
+.game-over-screen button {
+  padding: 12px 24px;
+  background-color: #2196F3;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-    .game-over-screen button:hover {
-      background-color: #1976D2;
-    }
+.game-over-screen button:hover {
+  background-color: #1976D2;
+}
 
     /* Responsivité */
     @media (max-width: 600px) {
@@ -251,28 +270,26 @@
                      : characterId === "char3" ? "robin"
                      : "anais"; // char4
 
-    // Survol du bouton d'un personnage
+    // Survol du bouton d'un personnage (son retiré ici)
     character.addEventListener("mouseover", () => {
-      handleHoverSound(characterName);
       if (!character.classList.contains("selected")) {
         character.style.border = "4px solid #ff4081";
       }
     });
 
-    // Fin du survol
+    // Fin du survol (son retiré ici)
     character.addEventListener("mouseout", () => {
       if (!character.classList.contains("selected")) {
         character.style.border = "none";
       }
-      sounds[characterName].pause();
     });
 
     // Clic sur un personnage
     character.addEventListener("click", () => {
-      stopAllSounds();
+      stopAllSounds(); // Arrêter tous les sons avant de jouer un nouveau
       selectedCharacter = characterName;
       player.image = playerImages[characterName];
-      sounds[`${selectedCharacter}_super`].play();
+      sounds[`${selectedCharacter}`].play(); // Jouer le son du personnage sélectionné
 
       Array.from(characters).forEach(c => {
         c.classList.remove("selected");
@@ -291,7 +308,8 @@
       return;
     }
     selectionScreen.style.display = "none";
-    stopAllSounds();
+    stopAllSounds(); // Arrêter tous les sons avant de commencer
+    sounds[`${selectedCharacter}_super`].play(); // Jouer le son du personnage au début du jeu
     startGame();
   });
 
@@ -366,10 +384,10 @@
     requestAnimationFrame(update);
   }
 
-  function showGameOverScreen() {
-    finalScoreElement.textContent = score;
-    gameOverScreen.style.display = "block";
-  }
+function showGameOverScreen() {
+  finalScoreElement.textContent = score;
+  gameOverScreen.style.display = "block"; // Affiche l'écran de fin de jeu
+}
 
   restartButton.addEventListener("click", startGame);
   backToSelectionButton.addEventListener("click", () => {
